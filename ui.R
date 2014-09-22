@@ -60,7 +60,8 @@ shinyUI(pageWithSidebar(
        dataTableOutput("aggTable")
       ),
       tabPanel("Ac-NonAc",
-        dataTableOutput("grepTable")
+        dataTableOutput("grepTable"),
+        downloadLink('downloadGrep', 'Download')
       )
     )
   )

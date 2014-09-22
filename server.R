@@ -43,4 +43,12 @@ shinyServer(function(input, output) {
   output$qualityPlots <- renderPlot(plot.GPR.quality(datanorm()))
   output$aggTable <- renderDataTable(dataagg())
   output$grepTable <- renderDataTable(grep.GPR.Ac(dataagg()))
+  output$downloadGrep <- downloadHandler(
+    filename = function() {
+      paste('data-grep', Sys.Date(), '.csv', sep='')
+    },
+    content = function(con) {
+         write.csv(grep.GPR.Ac(dataagg()), con)
+     }
+  )
 })
