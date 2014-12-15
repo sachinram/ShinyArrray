@@ -35,7 +35,7 @@ shinyServer(function(input, output) {
     else if (input$normMethod == "quantile")
       norm.GPR.quantile(dataresponse())
     else if (input$normMethod == "invariant")
-      norm.GPR.invariant(dataresponse(),refresponse())
+      norm.GPR.invariant(dataresponse(),refresponse(),3,input$refSA)
   })
   
   dataagg <- reactive(agg.GPR(datanorm()))
