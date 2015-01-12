@@ -18,9 +18,14 @@ shinyUI(pageWithSidebar(
   # Sidebar with a slider input for number of bins
   sidebarPanel(
     
-    h5("GPR File"),
+    h5("GPR File 1"),
     
-    fileInput("inputfile","Select GPR file"),
+    fileInput("inputfile1","Select GPR file"),
+   
+    h5("GPR File 2"),
+    
+    fileInput("inputfile2","Select GPR file"),
+    
     
     hr(),h5("Parameters"),
     
@@ -42,27 +47,48 @@ shinyUI(pageWithSidebar(
     ),
     
     conditionalPanel(condition="input.normMethod=='invariant'",
-      fileInput("reffile","Reference GPR file"),
-      numericInput("refSA","Reference Subarray",2,1,10,1)      
+      fileInput("reffile","Reference GPR file")
+      #numericInput("refSA","Reference Subarray",2,1,10,1)      
     )
   ),
   
   # Show a plot of the generated distribution
   mainPanel(
     tabsetPanel(
-      tabPanel("gpr file",
-        dataTableOutput("gprTable")
+      tabPanel("File 1",
+        tabsetPanel(
+          tabPanel("gpr file",
+            dataTableOutput("gprTable1")
+          ),
+          tabPanel("Quality",
+            plotOutput("qualityPlots1",width="100%",height="1000px")
+          ),
+          tabPanel("Aggregated",
+            dataTableOutput("aggTable1")
+          ),
+          tabPanel("Ac-NonAc",
+            dataTableOutput("grepTable1"),
+            downloadLink('downloadGrep1', 'Download')
+          )
+        )
       ),
-      tabPanel("Quality",
-        plotOutput("qualityPlots",width="100%",height="1000px")
-      ),
-      tabPanel("Aggregated",
-       dataTableOutput("aggTable")
-      ),
-      tabPanel("Ac-NonAc",
-        dataTableOutput("grepTable"),
-        downloadLink('downloadGrep', 'Download')
-      )
+      tabPanel("File 2",
+        tabsetPanel(
+          tabPanel("gpr file",
+            dataTableOutput("gprTable2")
+          ),
+          tabPanel("Quality",
+            plotOutput("qualityPlots2",width="100%",height="1000px")
+          ),
+          tabPanel("Aggregated",
+            dataTableOutput("aggTable2")
+          ),
+          tabPanel("Ac-NonAc",
+            dataTableOutput("grepTable2"),
+            downloadLink('downloadGrep2', 'Download')
+          )
+        )
+      )	
     )
   )
 ))

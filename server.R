@@ -19,36 +19,62 @@ shinyServer(function(input, output) {
   source("agg.GPR.R")
   source("grep.GPR.Ac.R")
   
-  datafile <- reactive(read.GPR(input$inputfile[1,"datapath"]))
-  datawoempty <- reactive(subset(datafile(), Name != "empty"))
-  dataresponse <- reactive(set.response.GPR(datawoempty(),input$responseMethod,input$wavelengths))
+  datafile1 <- reactive(read.GPR(input$inputfile1[1,"datapath"]))
+  datafile2 <- reactive(read.GPR(input$inputfile2[1,"datapath"]))
+  datawoempty1 <- reactive(subset(datafile1(), Name != "empty"))
+  datawoempty2 <- reactive(subset(datafile2(), Name != "empty"))
+  dataresponse1 <- reactive(set.response.GPR(datawoempty1(),input$responseMethod,input$wavelengths))
+  dataresponse2 <- reactive(set.response.GPR(datawoempty2(),input$responseMethod,input$wavelengths))
   refresponse <- reactive({
     reffile <- read.GPR(input$reffile[1,"datapath"])
     refwoempty <- subset(reffile, Name != "empty")
     set.response.GPR(refwoempty,input$responseMethod,input$wavelengths)
   })
-  datanorm <- reactive({
+  datanorm1 <- reactive({
     if(input$normMethod == "non-Acetylated")
-      norm.GPR.nac(dataresponse())
+      norm.GPR.nac(dataresponse1())
     else if (input$normMethod == "global")
-      norm.GPR.global(dataresponse())
+      norm.GPR.global(dataresponse1())
     else if (input$normMethod == "quantile")
-      norm.GPR.quantile(dataresponse())
+      norm.GPR.quantile(dataresponse1())
     else if (input$normMethod == "invariant")
-      norm.GPR.invariant(dataresponse(),refresponse(),3,input$refSA)
+      norm.GPR.invariant(dataresponse1(),refresponse(),3)
+  })
+  datanorm2 <- reactive({
+    if(input$normMethod == "non-Acetylated")
+      norm.GPR.nac(dataresponse(2))
+    else if (input$normMethod == "global")
+      norm.GPR.global(dataresponse2())
+    else if (input$normMethod == "quantile")
+      norm.GPR.quantile(dataresponse2())
+    else if (input$normMethod == "invariant")
+      norm.GPR.invariant(dataresponse2(),refresponse(),3)
   })
   
-  dataagg <- reactive(agg.GPR(datanorm()))
-  output$gprTable <- renderDataTable(datanorm())
-  output$qualityPlots <- renderPlot(plot.GPR.quality(datanorm()))
-  output$aggTable <- renderDataTable(dataagg())
-  output$grepTable <- renderDataTable(grep.GPR.Ac(dataagg()))
-  output$downloadGrep <- downloadHandler(
+  dataagg1 <- reactive(agg.GPR(datanorm1()))
+  output$gprTable1 <- renderDataTable(datanorm1())
+  output$qualityPlots1 <- renderPlot(plot.GPR.quality(datanorm1()))
+  output$aggTable1 <- renderDataTable(dataagg1())
+  output$grepTable1 <- renderDataTable(grep.GPR.Ac(dataagg1()))
+  output$downloadGrep1 <- downloadHandler(
     filename = function() {
       paste('data-grep', Sys.Date(), '.csv', sep='')
     },
     content = function(con) {
-         write.csv(grep.GPR.Ac(dataagg()), con)
+         write.csv(grep.GPR.Ac(dataagg1()), con)
+     }
+  )
+  dataagg2 <- reactive(agg.GPR(datanorm2()))
+  output$gprTable2 <- renderDataTable(datanorm2())
+  output$qualityPlots2 <- renderPlot(plot.GPR.quality(datanorm2()))
+  output$aggTable2 <- renderDataTable(dataagg2())
+  output$grepTable2 <- renderDataTable(grep.GPR.Ac(dataagg2()))
+  output$downloadGrep2 <- downloadHandler(
+    filename = function() {
+      paste('data-grep', Sys.Date(), '.csv', sep='')
+    },
+    content = function(con) {
+         write.csv(grep.GPR.Ac(dataagg2()), con)
      }
   )
 })

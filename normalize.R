@@ -46,18 +46,19 @@ norm.GPR.quantile <- function (data,subarrays=3)
   return(data)
 }
 
-norm.GPR.invariant <- function (data, ref, subarrays=3, refSA=2) 
+norm.GPR.invariant <- function (data, ref, subarrays=3) 
 {
   prd.td.vals = c(0.003, 0.008)
   library(affy)
   
   blocksPerSA <- max(data$Block)/subarrays
   result <- data.frame();
-  ref <- subset(ref, Block <= refSA*blocksPerSA & Block > (refSA-1)*blocksPerSA)
+  #ref <- subset(ref, Block <= refSA*blocksPerSA & Block > (refSA-1)*blocksPerSA)
+  ref.response <- apply(matrix(ref$response,ncol=subarrays),1,mean)
   for(i in 1:subarrays)
   {
     sa <- subset(data, Block <= i*blocksPerSA & Block > (i-1)*blocksPerSA)
-    tmp <- normalize.invariantset(sa$response, ref$response,prd.td = prd.td.vals)
+    tmp <- normalize.invariantset(sa$response, ref.response,prd.td = prd.td.vals)
     sa$response.norm <- as.numeric(approx(tmp$n.curve$y, tmp$n.curve$x, 
                                          xout = sa$response, rule = 2)$y)
     sa$response.sd.norm <- as.numeric(approx(tmp$n.curve$y, tmp$n.curve$x, 
